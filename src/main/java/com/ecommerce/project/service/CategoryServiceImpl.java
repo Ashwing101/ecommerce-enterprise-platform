@@ -55,20 +55,19 @@ public class CategoryServiceImpl implements  ICategoryService{
 
     @Override
     public CategoryResponseDTO deleteCategory(long id) {
-       // List<Category> categories = catergoryRespository.findAll();
 
 //        Category category = catergoryRespository.findById(id)
-//                .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource Not Found"));
+//        .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource Not Found"));
+//
+//        Category category = categories.stream()
+//        .filter(n -> n.getCategoryId().equals(id))
+//        .findFirst()
+//        .orElseThrow(()-> new ResponseStatusException(NOT_FOUND, "Resource not found"));
 
         Category category = catergoryRespository.findById(id)
                 .orElseThrow( () -> new ResourceNotFoundException("Category", "CatergoryId", id)); // Custom Excpetion
 
         CategoryDTO categoryDTO = modelMapper.map(category, CategoryDTO.class);
-//        Category category = categories.stream()
-//                .filter(n -> n.getCategoryId().equals(id))
-//                .findFirst()
-//                .orElseThrow(()-> new ResponseStatusException(NOT_FOUND, "Resource not found"));
-
         CategoryResponseDTO resp = new CategoryResponseDTO();
         resp.setContent(List.of(categoryDTO));
         catergoryRespository.delete(category);
