@@ -9,10 +9,14 @@ import com.ecommerce.project.payload.CategoryResponseDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 
 @Service
@@ -25,8 +29,16 @@ public class CategoryServiceImpl implements  ICategoryService{
     private ModelMapper modelMapper;
 
     @Override
-    public CategoryResponseDTO getAllCategories() {
-        List<Category> categoryList =  catergoryRespository.findAll();
+    public CategoryResponseDTO getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+       //Sort of Pagination Data
+        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        //For Pagination
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Page<Category> categoryPage = catergoryRespository.findAll(pageDetails);
+        List<Category> categoryList =  categoryPage.getContent();
+      //  List<Category> categoryList =  catergoryRespository.findAll();
         if(categoryList.isEmpty())
              throw new ApiException("No Categories is added till now!!!");
 
@@ -35,6 +47,10 @@ public class CategoryServiceImpl implements  ICategoryService{
 
         CategoryResponseDTO  categoryResponseDTO = new CategoryResponseDTO();
         categoryResponseDTO.setContent(categoryDTO);
+        categoryResponseDTO.setLastPage(categoryPage.isLast());
+        categoryResponseDTO.setPageNumber(categoryPage.getNumber());
+        categoryResponseDTO.setTotalElements(categoryPage.getTotalElements());
+        categoryResponseDTO.setPageSize(categoryPage.getSize());
         return categoryResponseDTO;
     }
 
